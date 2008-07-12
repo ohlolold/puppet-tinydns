@@ -46,8 +46,7 @@ node "ns1.domain.com" inherits basenode {
 
 node "ns1.domain.com" inherits basenode {
 	include ...,
-		tinydns,
-		tinydns::server::base
+		tinydns
 
 	$tinydns = "/etc/tinydns"
 
@@ -81,8 +80,7 @@ node "ns1.domain.com" inherits basenode {
 
 node "ns2.domain.com" inherits basenode {
 	include ...,
-		tinydns,
-		tinydns::server::base
+		tinydns
 
 	$tinydns = "/etc/tinydns"
 

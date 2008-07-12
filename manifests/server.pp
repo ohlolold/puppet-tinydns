@@ -1,39 +1,3 @@
-class tinydns::server::base {
-	file {
-		"ssh_dir":
-			path => "/root/.ssh",
-			owner => root,
-			group => root,
-			mode => 700,
-			ensure => directory;
-
-		"tinydns_key":
-			path => "/root/.ssh/tinydns_dsa",
-			owner => root,
-			group => root,
-			mode => 600,
-			source => "puppet://$servername/tinydns/root/.ssh/tinydns_dsa",
-			ensure => present,
-			require => File["ssh_dir"];
-
-		"tinydns_authorized_keys":
-			path => "/root/.ssh/authorized_keys",
-			owner => root,
-			group => root,
-			mode => 600,
-			source => "puppet://$servername/tinydns/root/.ssh/tinydns_dsa.pub",
-			ensure => present,
-			require => File["ssh_dir"];
-
-		"dnsroots.global":
-			path => "/etc/dnsroots.global",
-			owner => root,
-			group => root,
-			mode => 644,
-			source => "puppet://$servername/tinydns/etc/dnsroots.global"
-	}
-}
-
 define tinydns::server(
 		$directory,
 		$listen_address,
