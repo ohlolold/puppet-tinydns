@@ -1,0 +1,21 @@
+remote: data.cdb
+<% slaves.each do |slave| -%>
+	# To <%= slave %>
+	scp -i /root/.ssh/tinydns_dsa data.cdb \
+		<%= slave %>:<%= tinydns_dir %>/root/data.cdb.tmp
+
+	ssh -i /root/.ssh/tinydns_dsa <%= slave %> \
+		'mv <%= tinydns_dir %>/root/data.cdb.tmp \
+		<%= tinydns_dir %>/root/data.cdb'
+
+<% end -%>
+
+data.cdb: cat-zones data
+	/usr/local/bin/tinydns-data
+
+cat-zones:
+	cat \
+<% zones.each do |zone| -%>
+		zones/<%= zone %> \
+<% end -%>
+		> data

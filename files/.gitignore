@@ -1,0 +1,6 @@
+tmp/*
+!tmp/.empty
+root/*
+!root/.empty
+etc/*
+!etc/.empty

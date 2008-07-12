@@ -1,0 +1,117 @@
+Puppet tinydns module.
+
+**Usage**
+
+1. To set up a dnscache:
+
+node "ns1.domain.com" inherits basenode {
+	include ...,
+		tinydns
+
+	$dnscache = "/etc/dnscache"
+	$dnscache_root = "$dnscache/root"
+
+	# set up the cache itself
+	tinydns::cache { "dnscache":
+		directory => $dnscache,
+		listen_address "1.2.3.4",
+		ensure => present
+	}
+
+	# do we want to forward for any zones?
+	$fwd_zones = [
+		"$dnscache_root/servers/domain1.com",
+		"$dnscache_root/servers/domain2.com"
+	]
+
+	# set up the forwarding and tell dnscache where to forward to
+	tinydns::forwardzone { $fwd_zones:
+		service => "dnscache", # must match the dnscache title above
+		data => "1.2.3.4\n"
+	}
+
+	# allow some people to query the cache
+	$allow_files = [
+		"$dnscache_root/ip/127.0.0.1",
+		$dnscache_root/ip/10"
+	]
+
+	# set up the allow files
+	tinydns::cacheallow { $allow_files:
+		service => "dnscache" # must match the dnscache title above
+	}
+}
+
+2. To set up a Tinydns master:
+
+node "ns1.domain.com" inherits basenode {
+	include ...,
+		tinydns,
+		tinydns::server::base
+
+	$tinydns = "/etc/tinydns"
+
+	# we have some slave servers
+	$slaves = [
+		"ns2.domain.com"
+	]
+
+	# we're authoritative for these zones
+	$zones = [
+		"domain.com"
+	]
+
+	# set up the server
+	tinydns::server { "tinydns":
+		directory => $tinydns,
+		listen_address => "1.2.3.4",
+		ensure => present
+	}
+
+	# we're master
+	tinydns::master { "tinydns":
+		directory => $tinydns,
+		slaves => $slaves,
+		zones => $zones,
+		ensure => present
+	}
+}
+
+3. To set up a Tinydns slave:
+
+node "ns2.domain.com" inherits basenode {
+	include ...,
+		tinydns,
+		tinydns::server::base
+
+	$tinydns = "/etc/tinydns"
+
+	# set up the server
+	tinydns::server { "tinydns":
+		directory => $tinydns,
+		listen_address => "1.2.3.4",
+		ensure => present
+	}
+
+	# we're slave
+	tinydns::slave { "tinydns":
+		directory => $tinydns,
+		ensure => present
+	}
+}
+
+**Miscellaneous notes**
+
+This module depends on the following file:
+- tinydns/files/etc/dnsroots.global 
+
+To create this file, run the following script:
+- tinydns/files/scripts/updateroots.sh
+
+You may want to run it from cron once a month or so. It updates the list of root servers from Internic's list.
+
+It's up to you to ensure appropriate ssh keys are set up on the master and slaves to ensure propagation when you run `make'.
+
+You must create and manage the actual zone files.
+
+If you're not sure how to use Tinydns, consult http://www.google.com/
