@@ -1,7 +1,6 @@
 define tinydns::cache(
 		$directory,
 		$listen_address,
-		$lookup_test = "www.google.com",
 		$ensure = "present") {
 
 	$svc_dir = "/service/$name"
