@@ -110,6 +110,8 @@ To create this file, run the following script:
 
 You may want to run it from cron once a month or so. It updates the list of root servers from Internic's list.
 
+axfrdns support is limited.
+
 It's up to you to ensure appropriate ssh keys are set up on the master and slaves to ensure propagation when you run `make'.
 
 You must create and manage the actual zone files.
